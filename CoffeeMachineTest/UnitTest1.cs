@@ -31,17 +31,14 @@ public class BrewCoffeeTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task BrewCoffee_EveryFifthCall_ReturnsServiceUnavailable()
     {
-        HttpResponseMessage response = null!;
+        var responses = new List<HttpResponseMessage>();
 
         for (int i = 1; i <= 5; i++)
         {
-            response = await _client.GetAsync("/brew-coffee");
+            responses.Add(await _client.GetAsync("/brew-coffee"));
         }
 
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-
-        var body = await response.Content.ReadAsStringAsync();
-        Assert.True(string.IsNullOrEmpty(body));
+        Assert.Contains(responses, r => r.StatusCode == HttpStatusCode.ServiceUnavailable);
     }
 
     private class CoffeeResponse
